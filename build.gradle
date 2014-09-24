@@ -1,0 +1,49 @@
+
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'jetty'
+
+configurations {
+    cucumberRuntime {
+        extendsFrom testRuntime
+    }
+}
+
+
+
+testpackage = 'homepage'
+
+task cucumber() {
+    dependsOn assemble, compileTestJava, jettyRunWar
+    doLast {
+        javaexec {
+            main = "cucumber.api.cli.Main"
+            classpath = configurations.cucumberRuntime + sourceSets.main.output + sourceSets.test.output
+            args = ['-f', 'pretty', '--glue', testpackage, 'src/test/resources']
+        }
+    }
+}
+
+dependencies {
+    testCompile 'info.cukes:cucumber-java:1.1.8'
+    testCompile 'info.cukes:cucumber-junit:1.1.8'
+    testCompile 'junit:junit:4.11'
+    testCompile 'org.seleniumhq.selenium:selenium-java:2.43.1'
+
+
+    compile 'org.springframework:spring-webmvc:3.2.11.RELEASE'
+    compile 'org.eclipse.jetty:jetty-webapp:9.2.3.v20140905'
+    compile 'javax.servlet:javax.servlet-api:2.5'
+
+
+}
+
+repositories {
+    mavenCentral()
+}
+
+//jetty
+jettyRun.contextPath = ''
+jettyRunWar.contextPath = ''
+jettyRunWar.daemon = true
+jettyRun.daemon = false
